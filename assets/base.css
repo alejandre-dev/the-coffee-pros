@@ -2993,3 +2993,11 @@ details-disclosure > details {
     outline: transparent solid 1px;
   }
 }
+
+#upsell_select, #upsell_form, #parent_upsell_form {
+  display: none;
+}
+
+#upsell_btn {
+  width: 60%;
+}

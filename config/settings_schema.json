@@ -1555,6 +1555,23 @@
         "id": "cart_drawer_collection",
         "label": "t:settings_schema.cart.settings.cart_drawer.collection.label",
         "info": "t:settings_schema.cart.settings.cart_drawer.collection.info"
+      },
+      {
+        "type": "header",
+        "content": "Upsell Product"
+      },
+      {
+        "type": "text",
+        "id": "upsell_product_title",
+        "label": "Headline",
+        "default": "You might like this...",
+        "info": "Headline displayed above the upsell product"
+      },
+      {
+        "type": "product",
+        "id": "cart_drawer_product",
+        "label": "Product",
+        "info": "Visible when cart drawer is not empty and the product is not already in the cart"
       }
     ]
   }

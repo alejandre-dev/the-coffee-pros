@@ -236,9 +236,37 @@
       document.documentElement.classList.add('shopify-design-mode');
     }
     </script>
+    
+    {% assign pathArray = request.path | split: "/" %}
+    {% assign pathname = pathArray[1] %}
+
+    {% if settings.cart_type == "drawer" and settings.cart_drawer_product.id and pathname != "products" %}
+      <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+    {% endif %}
+
   </head>
 
   <body class="gradient">
+    <product-form class="product-form" id="parent_upsell_form">
+      <form method="post" action="/cart/add" id="upsell_form">
+        <span class="loading-overlay__spinner" style="display: none;">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </span>
+        <select name="id" id="upsell_select">
+          <option value="{{ settings.cart_drawer_product.selected_or_first_available_variant.id }}">{{ settings.cart_drawer_product.title }}</option>
+        </select>
+      </form>
+      <button type="submit" id="upsell_btn" form="upsell_form">Add to cart</button>
+    </product-form>
+
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ "accessibility.skip_to_text" | t }}
     </a>

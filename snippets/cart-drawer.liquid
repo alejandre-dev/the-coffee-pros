@@ -13,6 +13,8 @@
   }
 </style>
 
+{% assign show_upsell = true %}
+
 <cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
   <div id="CartDrawer" class="cart-drawer">
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
@@ -110,6 +112,9 @@
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
+                      {% if item.variant_id == settings.cart_drawer_product.selected_or_first_available_variant.id %}
+                        {% assign show_upsell = false %}
+                      {% endif %}
                       <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" role="row">
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
@@ -338,6 +343,72 @@
                         </td>
                       </tr>
                     {%- endfor -%}
+                    {% if show_upsell and settings.cart_drawer_product.id %}
+                      {% if settings.upsell_product_title %}
+                        <tr id="CartDrawer-Item-UpsellProductHeadline" role="row">
+                          <td class="cart-item__name h3 break" role="cell">
+                            {{ settings.upsell_product_title }}
+                          </td>
+                        </tr>
+                      {% endif %}
+                      {%- assign upsell_product = settings.cart_drawer_product.selected_or_first_available_variant -%}
+                      <tr id="CartDrawer-Item-UpsellProduct" class="cart-item" role="row">
+                        <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
+                          {% if upsell_product.product.featured_image %}
+                            {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
+                            <a href="{{ upsell_product.url }}" class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
+                            <img
+                              class="cart-item__image"
+                              src="{{ upsell_product.product.featured_image | image_url: width: 300 }}"
+                              alt="{{ upsell_product.product.featured_image.alt | escape }}"
+                              loading="lazy"
+                              width="150"
+                              height="{{ 150 | divided_by: upsell_product.image.aspect_ratio | ceil }}"
+                            >
+                          {% endif %}
+                        </td>
+
+                        <td class="cart-item__details" role="cell" headers="CartDrawer-ColumnProduct">
+                          {%- if settings.show_vendor -%}
+                            <p class="caption-with-letter-spacing light">{{ upsell_product.product.vendor }}</p>
+                          {%- endif -%}
+
+                          <a href="{{ upsell_product.url }}" class="cart-item__name h4 break">
+                            {{- upsell_product.product.title | escape -}}
+                          </a>
+
+                            <div class="product-option">
+                              {{ upsell_product.price | money }}
+                            </div>
+                        </td>
+
+                        <td class="cart-item__totals right" role="cell" headers="CartDrawer-ColumnTotal">
+                          <div class="loading-overlay hidden">
+                            <div class="loading-overlay__spinner">
+                              <svg
+                                aria-hidden="true"
+                                focusable="false"
+                                class="spinner"
+                                viewBox="0 0 66 66"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div class="cart-item__price-wrapper">
+                              <span class="price price--end">
+                                {{ upsell_product.price | money }}
+                              </span>
+                          </div>
+                        </td>
+
+                        <td class="cart-item__quantity" role="cell" headers="CartDrawer-ColumnQuantity">
+                          <button type="submit" id="upsell_btn" form="upsell_form" class="product-form__submit button button--full-width button--secondary">Add to cart</button>
+                        </td>
+                      </tr>
+                    {% endif %}
                   </tbody>
                 </table>
               </div>
