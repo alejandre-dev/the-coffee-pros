@@ -127,7 +127,7 @@
     "show_vendor": false,
     "show_cart_note": false,
     "cart_drawer_collection": "",
-    "upsell_product_title": "Grab this too!",
+    "upsell_product_title": "Get this product now!",
     "cart_drawer_product": "coffee-ethiopia",
     "sections": {
       "main-password-header": {
