@@ -27,6 +27,12 @@
   #Banner-{{ section.id }}::after {
     opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
   }
+
+  {% if section.blocks == empty %}
+    .banner::after, .banner__media::after {
+      z-index: -2;
+    }
+  {% endif %}
 {%- endstyle -%}
 
 <div
@@ -41,7 +47,14 @@
     {% if section.settings.desktop_video %}
 
       <div class="banner__media media video-background">
-        <video autoplay muted loop playsinline id="desktopVideo">
+        <video 
+          {% if section.settings.desktop_enable_autoplay %} autoplay {% endif %} 
+          {% if section.settings.desktop_enable_muted %} muted {% endif %} 
+          {% if section.settings.desktop_enable_loop %} loop {% endif %} 
+          {% if section.settings.desktop_enable_controls %} controls {% endif %} 
+          playsinline 
+          id="desktopVideo"
+        >
           <source src="{{ section.settings.desktop_video.sources[1].url }}" type="video/mp4">
           Your browser does not support HTML5 video.
         </video>
@@ -54,7 +67,14 @@
       <div class="is-hidden-desktop-only">
 
         <div class="banner__media media video-background">
-          <video autoplay muted loop playsinline id="mobileVideo">
+          <video
+            {% if section.settings.mobile_enable_autoplay %} autoplay {% endif %} 
+            {% if section.settings.mobile_enable_muted %} muted {% endif %} 
+            {% if section.settings.mobile_enable_loop %} loop {% endif %} 
+            {% if section.settings.mobile_enable_controls %} controls {% endif %} 
+            playsinline 
+            id="mobileVideo"
+          >
             <source src="{{ section.settings.mobile_video.sources[1].url }}" type="video/mp4">
             Your browser does not support HTML5 video.
           </video>
@@ -124,52 +144,54 @@
       }}
     </div>
   {%- endif -%}
-  <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width">
-    <div class="banner__box content-container content-container--full-width-mobile color-{{ section.settings.color_scheme }} gradient">
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'heading' -%}
-            <h2 class="banner__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
-              <span>{{ block.settings.heading | escape }}</span>
-            </h2>
-          {%- when 'text' -%}
-            <div class="banner__text {{ block.settings.text_style }}" {{ block.shopify_attributes }}>
-              <span>{{ block.settings.text | escape }}</span>
-            </div>
-          {%- when 'buttons' -%}
-            <div
-              class="banner__buttons{% if block.settings.button_label_1 != blank and block.settings.button_label_2 != blank %} banner__buttons--multiple{% endif %}"
-              {{ block.shopify_attributes }}
-            >
-              {%- if block.settings.button_label_1 != blank -%}
-                <a
-                  {% if block.settings.button_link_1 == blank %}
-                    role="link" aria-disabled="true"
-                  {% else %}
-                    href="{{ block.settings.button_link_1 }}"
-                  {% endif %}
-                  class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}"
-                >
-                  {{- block.settings.button_label_1 | escape -}}
-                </a>
-              {%- endif -%}
-              {%- if block.settings.button_label_2 != blank -%}
-                <a
-                  {% if block.settings.button_link_2 == blank %}
-                    role="link" aria-disabled="true"
-                  {% else %}
-                    href="{{ block.settings.button_link_2 }}"
-                  {% endif %}
-                  class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}"
-                >
-                  {{- block.settings.button_label_2 | escape -}}
-                </a>
-              {%- endif -%}
-            </div>
-        {%- endcase -%}
-      {%- endfor -%}
+  {% unless section.blocks == empty %}
+    <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width">
+      <div class="banner__box content-container content-container--full-width-mobile color-{{ section.settings.color_scheme }} gradient">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'heading' -%}
+              <h2 class="banner__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                <span>{{ block.settings.heading | escape }}</span>
+              </h2>
+            {%- when 'text' -%}
+              <div class="banner__text {{ block.settings.text_style }}" {{ block.shopify_attributes }}>
+                <span>{{ block.settings.text | escape }}</span>
+              </div>
+            {%- when 'buttons' -%}
+              <div
+                class="banner__buttons{% if block.settings.button_label_1 != blank and block.settings.button_label_2 != blank %} banner__buttons--multiple{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                {%- if block.settings.button_label_1 != blank -%}
+                  <a
+                    {% if block.settings.button_link_1 == blank %}
+                      role="link" aria-disabled="true"
+                    {% else %}
+                      href="{{ block.settings.button_link_1 }}"
+                    {% endif %}
+                    class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}"
+                  >
+                    {{- block.settings.button_label_1 | escape -}}
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.button_label_2 != blank -%}
+                  <a
+                    {% if block.settings.button_link_2 == blank %}
+                      role="link" aria-disabled="true"
+                    {% else %}
+                      href="{{ block.settings.button_link_2 }}"
+                    {% endif %}
+                    class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}"
+                  >
+                    {{- block.settings.button_label_2 | escape -}}
+                  </a>
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
     </div>
-  </div>
+  {% endunless %}
 </div>
 
 {% schema %}
@@ -207,9 +229,57 @@
       "label": "Desktop video"
     },
     {
+      "type": "checkbox",
+      "id": "desktop_enable_autoplay",
+      "default": false,
+      "label": "Enable Desktop Video Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "desktop_enable_muted",
+      "default": false,
+      "label": "Enable Desktop Video Muted"
+    },
+    {
+      "type": "checkbox",
+      "id": "desktop_enable_loop",
+      "default": false,
+      "label": "Enable Desktop Video Loop"
+    },
+    {
+      "type": "checkbox",
+      "id": "desktop_enable_controls",
+      "default": true,
+      "label": "Enable Desktop Video Controls"
+    },
+    {
       "type": "video",
       "id": "mobile_video",
       "label": "Mobile video"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_enable_autoplay",
+      "default": false,
+      "label": "Enable Mobile Video Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_enable_muted",
+      "default": false,
+      "label": "Enable Mobile Video Muted"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_enable_loop",
+      "default": false,
+      "label": "Enable Mobile Video Loop"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_enable_controls",
+      "default": true,
+      "label": "Enable Mobile Video Controls"
     },
     {
       "type": "range",

@@ -434,7 +434,7 @@
 
 /*Custom CSS for Video Background*/
 .media.video-background>*:not(.zoom):not(.deferred-media__poster-button) {
-  height: auto;
+  height: -webkit-fill-available;
 }
 
 .banner__media, .banner:after, .banner__media:after {
